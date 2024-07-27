@@ -36,7 +36,7 @@ namespace Zoo
             do
             {
                 Console.WriteLine($"Введите порядковый номер вольера, чтобы подойти к нему.");
-                number = ReadInt();
+                number = UserUtils.ReadInt();
 
                 number -= 1;
             }
@@ -45,22 +45,14 @@ namespace Zoo
             return number;
         }
 
-        private int ReadInt()
-        {
-            int number;
-
-            while (int.TryParse(Console.ReadLine(), out number) == false)
-                Console.WriteLine("Это не число.");
-
-            return number;
-        }
-
         private void GenerateAnimalEnclosures()
         {
             int numberAnimalEnclosure = 4;
 
+            CreatorAnimalEnclosure creatorAnimalEnclosure = new CreatorAnimalEnclosure();
+
             for (int i = 0; i < numberAnimalEnclosure; i++)
-                _animalEnclosures.Add(CreatorAnimalEnclosure.GenerateAnimalEnclosure(ReturnAnimalEnclosureId()));
+                _animalEnclosures.Add(creatorAnimalEnclosure.GenerateAnimalEnclosure(ReturnAnimalEnclosureId()));
         }
 
         private int ReturnAnimalEnclosureId()
@@ -71,7 +63,7 @@ namespace Zoo
 
     class CreatorAnimalEnclosure
     {
-        public static AnimalEnclosure GenerateAnimalEnclosure(int id)
+        public AnimalEnclosure GenerateAnimalEnclosure(int id)
         {
             int minLimitAnimals = 1;
             int maxLimitAnimals = 4;
@@ -84,8 +76,10 @@ namespace Zoo
 
             List<Animal> animals = new List<Animal>();
 
+            CreatorAnimal creatorAnimal = new CreatorAnimal();
+
             for (int i = 0; i < numberAnimals; i++)
-                animals.Add(CreatorAnimal.GenerateAnimal(numberSpecies));
+                animals.Add(creatorAnimal.GenerateAnimal(numberSpecies));
 
             return new AnimalEnclosure(id, animals);
         }
@@ -117,19 +111,19 @@ namespace Zoo
 
     class CreatorAnimal
     {
-        private static List<string> s_maleNames = new List<string>() { "Мансур", "Борис", "Рыжик", "Бим" };
-        private static List<string> s_femaleNames = new List<string>() { "Дина", "Долли", "Люся", "Сэма" };
+        private List<string> _maleNames = new List<string>() { "Мансур", "Борис", "Рыжик", "Бим" };
+        private List<string> _femaleNames = new List<string>() { "Дина", "Долли", "Люся", "Сэма" };
 
-        private static int s_counterGender;
+        private int _counterGender;
 
-        public static Animal GenerateAnimal(int numberSpecies)
+        public Animal GenerateAnimal(int numberSpecies)
         {
             string gender = GetGender();
 
             return new Animal(GetName(gender), gender, GetSpecies(numberSpecies, out string soundMade), soundMade);
         }
 
-        private static string GetSpecies(int numberSpecies, out string soundMade)
+        private string GetSpecies(int numberSpecies, out string soundMade)
         {
             int numberSpeciesPantera = 1;
             int numberSpeciesElephant = 2;
@@ -157,13 +151,13 @@ namespace Zoo
             }
         }
 
-        private static string GetGender()
+        private string GetGender()
         {
-            s_counterGender++;
+            _counterGender++;
 
             int amountGender = 2;
 
-            int numberGender = s_counterGender % amountGender;
+            int numberGender = _counterGender % amountGender;
 
             if (numberGender == 0)
                 return "male";
@@ -171,7 +165,7 @@ namespace Zoo
                 return "female";
         }
 
-        private static string GetName(string gender)
+        private string GetName(string gender)
         {
             List<string> names = new List<string>();
 
@@ -179,19 +173,19 @@ namespace Zoo
             string genderFemale = "female";
 
             if (gender.ToLower() == genderMale)
-                return s_maleNames[UserUtils.GenerateRandomNumber(0, s_maleNames.Count)];
+                return _maleNames[UserUtils.GenerateRandomNumber(0, _maleNames.Count)];
             else if (gender.ToLower() == genderFemale)
-                return s_femaleNames[UserUtils.GenerateRandomNumber(0, s_femaleNames.Count)];
+                return _femaleNames[UserUtils.GenerateRandomNumber(0, _femaleNames.Count)];
             else
                 return GetName();
         }
 
-        private static string GetName()
+        private string GetName()
         {
             List<string> names = new List<string>();
 
-            UserUtils.UniteListString(names, s_maleNames);
-            UserUtils.UniteListString(names, s_femaleNames);
+            UserUtils.UniteListString(names, _maleNames);
+            UserUtils.UniteListString(names, _femaleNames);
 
             return names[UserUtils.GenerateRandomNumber(0, names.Count)];
         }
@@ -231,6 +225,16 @@ namespace Zoo
         {
             foreach (string line in senderList)
                 recipientList.Add(line);
+        }
+
+        public static int ReadInt()
+        {
+            int number;
+
+            while (int.TryParse(Console.ReadLine(), out number) == false)
+                Console.WriteLine("Это не число.");
+
+            return number;
         }
     }
 }

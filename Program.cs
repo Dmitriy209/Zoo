@@ -35,7 +35,7 @@ namespace Zoo
 
             do
             {
-                Console.WriteLine($"Введите порядковый номер вольера, чтобы подойти к нему.");
+                Console.WriteLine("Введите порядковый номер вольера, чтобы подойти к нему.");
                 number = UserUtils.ReadInt();
 
                 number -= 1;
@@ -167,8 +167,6 @@ namespace Zoo
 
         private string GetName(string gender)
         {
-            List<string> names = new List<string>();
-
             string genderMale = "male";
             string genderFemale = "female";
 

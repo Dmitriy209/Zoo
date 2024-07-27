@@ -60,10 +60,10 @@ namespace Zoo
             int numberAnimalEnclosure = 4;
 
             for (int i = 0; i < numberAnimalEnclosure; i++)
-                _animalEnclosures.Add(CreatorAnimalEnclosure.GenerateAnimalEnclosure(GetAnimalEnclosureId()));
+                _animalEnclosures.Add(CreatorAnimalEnclosure.GenerateAnimalEnclosure(ReturnAnimalEnclosureId()));
         }
 
-        private int GetAnimalEnclosureId()
+        private int ReturnAnimalEnclosureId()
         {
             return _lastAnimalEnclosureId++;
         }
@@ -75,7 +75,7 @@ namespace Zoo
         {
             int minLimitAnimals = 1;
             int maxLimitAnimals = 4;
-            
+
             int minLimitSpecies = 1;
             int maxLimitSpecies = 4;
 
@@ -104,7 +104,6 @@ namespace Zoo
         }
 
         public int Id { get; private set; }
-        public int AnimalsCount => _animals.Count;
 
         public void ShowStats()
         {
@@ -118,59 +117,71 @@ namespace Zoo
 
     class CreatorAnimal
     {
-        private static List<string> _maleNames = new List<string>() { "Мансур", "Борис", "Рыжик", "Бим" };
-        private static List<string> _femaleNames = new List<string>() { "Дина", "Долли", "Люся", "Сэма" };
+        private static List<string> s_maleNames = new List<string>() { "Мансур", "Борис", "Рыжик", "Бим" };
+        private static List<string> s_femaleNames = new List<string>() { "Дина", "Долли", "Люся", "Сэма" };
 
-        private static int counterGender;
+        private static int s_counterGender;
 
         public static Animal GenerateAnimal(int numberSpecies)
         {
-            Gender gender = GetGender();
+            string gender = GetGender();
 
-            return new Animal(GetName(gender), gender, GetSpecies(numberSpecies));
+            return new Animal(GetName(gender), gender, GetSpecies(numberSpecies, out string soundMade), soundMade);
         }
 
-        private static Species GetSpecies(int numberSpecies)
+        private static string GetSpecies(int numberSpecies, out string soundMade)
         {
             int numberSpeciesPantera = 1;
             int numberSpeciesElephant = 2;
             int numberSpeciesBoar = 3;
 
             if (numberSpeciesPantera == numberSpecies)
-                return new Pantera();
+            {
+                soundMade = "рычит";
+                return "Pantera";
+            }
             else if (numberSpeciesElephant == numberSpecies)
-                return new Elephant();
+            {
+                soundMade = "трубит";
+                return "Elephant";
+            }
             else if (numberSpeciesBoar == numberSpecies)
-                return new Boar();
+            {
+                soundMade = "хрюкает";
+                return "Boar";
+            }
             else
-                return new Bear();
+            {
+                soundMade = "рычит";
+                return "Bear";
+            }
         }
 
-        private static Gender GetGender()
+        private static string GetGender()
         {
-            counterGender++;
+            s_counterGender++;
 
             int amountGender = 2;
 
-            int numberGender = counterGender % amountGender;
+            int numberGender = s_counterGender % amountGender;
 
             if (numberGender == 0)
-                return new Male();
+                return "male";
             else
-                return new Female();
+                return "female";
         }
 
-        private static string GetName(Gender Gender)
+        private static string GetName(string gender)
         {
             List<string> names = new List<string>();
 
             string genderMale = "male";
             string genderFemale = "female";
 
-            if (Gender.Name.ToLower() == genderMale)
-                return _maleNames[UserUtils.GenerateRandomNumber(0, _maleNames.Count)];
-            else if (Gender.Name.ToLower() == genderFemale)
-                return _femaleNames[UserUtils.GenerateRandomNumber(0, _femaleNames.Count)];
+            if (gender.ToLower() == genderMale)
+                return s_maleNames[UserUtils.GenerateRandomNumber(0, s_maleNames.Count)];
+            else if (gender.ToLower() == genderFemale)
+                return s_femaleNames[UserUtils.GenerateRandomNumber(0, s_femaleNames.Count)];
             else
                 return GetName();
         }
@@ -179,8 +190,8 @@ namespace Zoo
         {
             List<string> names = new List<string>();
 
-            UserUtils.UniteListString(names, _maleNames);
-            UserUtils.UniteListString(names, _femaleNames);
+            UserUtils.UniteListString(names, s_maleNames);
+            UserUtils.UniteListString(names, s_femaleNames);
 
             return names[UserUtils.GenerateRandomNumber(0, names.Count)];
         }
@@ -188,114 +199,22 @@ namespace Zoo
 
     class Animal
     {
-        protected string _name;
-        protected Gender _gender;
-        protected Species _species;
-        protected SoundMade _soundMade;
+        private string _name;
+        private string _gender;
+        private string _species;
+        private string _soundMade;
 
-        public Animal(string name, Gender gender, Species species)
+        public Animal(string name, string gender, string species, string soundMade)
         {
             _name = name;
             _gender = gender;
             _species = species;
-            _soundMade = species.SoundMade;
+            _soundMade = soundMade;
         }
 
         public void ShowStats()
         {
             Console.WriteLine($"Меня зовут {_name}, я {_gender} пола, вида {_species} и я издаю звук {_soundMade}.");
-        }
-    }
-
-    class Gender
-    {
-        public string Name { get; protected set; }
-    }
-
-    class Male : Gender
-    {
-        public Male()
-        {
-            Name = nameof(Male);
-        }
-    }
-
-    class Female : Gender
-    {
-        public Female()
-        {
-            Name = nameof(Female);
-        }
-    }
-
-    class Species
-    {
-        public string Name { get; protected set; }
-        public SoundMade SoundMade { get; protected set; }
-    }
-
-    class Pantera : Species
-    {
-        public Pantera()
-        {
-            Name = nameof(Pantera);
-            SoundMade = new Growl();
-        }
-    }
-
-    class Elephant : Species
-    {
-        public Elephant()
-        {
-            Name = nameof(Elephant);
-            SoundMade = new Blowing();
-        }
-    }
-
-    class Boar : Species
-    {
-        public Boar()
-        {
-            Name = nameof(Boar);
-            SoundMade = new Grunt();
-        }
-    }
-
-    class Bear : Species
-    {
-        public Bear()
-        {
-            Name = nameof(Bear);
-            SoundMade = new Growl();
-        }
-    }
-
-    class SoundMade
-    {
-        public string Name { get; protected set; }
-    }
-
-    class Growl : SoundMade
-    {
-        public Growl()
-        {
-            Name = nameof(Growl);
-        }
-    }
-
-    class Blowing : SoundMade
-    {
-        public Blowing()
-        {
-            Name = nameof(Blowing);
-        }
-    }
-
-    class Grunt : SoundMade
-    {
-        public Grunt()
-        {
-            Name = nameof(Grunt);
         }
     }
 
